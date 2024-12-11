@@ -9,7 +9,7 @@ final class NewsInteractor: NewsBusinessLogic, NewsDataStore {
     private let presenter: NewsPresentationLogic
     private let worker: NewsWorker
     
-    var news: [NewsModel.ArticleModel] = [] {
+    var news: [ArticleModel] = [] {
         didSet {
             print("Refreshed")
         }

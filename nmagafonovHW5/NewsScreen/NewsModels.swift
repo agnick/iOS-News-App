@@ -21,8 +21,4 @@ enum NewsModel {
         
         struct ViewModel {}
     }
-    
-    struct ArticleModel {
-        
-    }
 }

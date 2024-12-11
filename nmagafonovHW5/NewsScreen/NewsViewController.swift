@@ -7,7 +7,7 @@
 
 import UIKit
 
-class NewsViewController: UIViewController {
+final class NewsViewController: UIViewController {
     // MARK: - Enums
     enum NewsConstants {
         // NewsTableView settings.
@@ -15,6 +15,7 @@ class NewsViewController: UIViewController {
         static let newsTableViewBottom: CGFloat = 10
         static let newsTableViewLeading: CGFloat = 10
         static let newsTableViewTrailing: CGFloat = 10
+        static let newsTableRowsHeight: CGFloat = 100
     }
     
     // MARK: - Variables
@@ -63,7 +64,7 @@ class NewsViewController: UIViewController {
         
         // Register the cell class for reuse.
         newsTableView
-            .register(UITableViewCell.self, forCellReuseIdentifier: "NewsCell")
+            .register(NewsCell.self, forCellReuseIdentifier: NewsCell.reuseId)
         
         newsTableView.isScrollEnabled = true
         newsTableView.alwaysBounceVertical = true
@@ -93,12 +94,15 @@ extension NewsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(
-            withIdentifier: "NewsCell",
+            withIdentifier: NewsCell.reuseId,
             for: indexPath
-        )
+        ) as! NewsCell
         
-        cell.textLabel?.text = "Row \(indexPath)"
+        let title = "Title \(indexPath.row)"
+        let announce = "Announce \(indexPath.row)"
         
+        cell.configure(title, announce)
+                
         return cell
     }
 }
@@ -110,5 +114,9 @@ extension NewsViewController : UITableViewDelegate {
         didSelectRowAt indexPath: IndexPath
     ) {
         print("Selected \(indexPath)")
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return NewsConstants.newsTableRowsHeight
     }
 }

@@ -11,7 +11,7 @@ protocol NewsBusinessLogic {
 }
 
 protocol NewsDataStore {
-    var news: [NewsModel.ArticleModel] { get set }
+    var news: [ArticleModel] { get set }
     
     func loadFreshNews(_request: NewsModel.Start.Request)
     func loadMoreNews(_request: NewsModel.Other.Request)
