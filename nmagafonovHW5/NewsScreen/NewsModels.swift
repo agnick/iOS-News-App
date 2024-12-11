@@ -43,4 +43,10 @@ enum NewsModel {
         
         struct ViewModel {}
     }
+    
+    enum Navigation {
+        struct Request {
+            let destination: UIViewController
+        }
+    }
 }

@@ -11,4 +11,5 @@ struct FetchedArticleData {
     let title: String
     let announce: String
     let image: UIImage
+    let articleUrl: URL
 }

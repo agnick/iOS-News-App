@@ -127,7 +127,10 @@ extension NewsViewController : UITableViewDelegate {
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath
     ) {
+        let url = news[indexPath.row].articleUrl
+        let destination = WebViewController(url)
         
+        interactor?.routeTo(NewsModel.Navigation.Request(destination: destination))
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

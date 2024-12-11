@@ -5,9 +5,13 @@
 //  Created by Никита Агафонов on 11.12.2024.
 //
 
+import UIKit
+
 protocol NewsBusinessLogic {
     func loadStart(_ request: NewsModel.Start.Request)
     func loadOther(_ request: NewsModel.Other.Request)
+    
+    func routeTo(_ request: NewsModel.Navigation.Request)
 }
 
 protocol NewsDataStore {
@@ -23,5 +27,5 @@ protocol NewsPresentationLogic {
     func presentMoreNews(_ response: NewsModel.MoreNews.Response)
     func presentError(_ response: String)
     
-    func routeTo()
+    func routeTo(_ viewController: UIViewController)
 }

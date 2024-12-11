@@ -28,7 +28,7 @@ final class NewsPresenter: NewsPresentationLogic {
     }
     
     
-    func routeTo() {
-        view?.navigationController?.pushViewController(UIViewController(), animated: true)
+    func routeTo(_ viewController: UIViewController) {
+        view?.navigationController?.pushViewController(viewController, animated: true)
     }
 }

@@ -8,6 +8,11 @@
 import UIKit
 
 final class NewsInteractor: NewsBusinessLogic, NewsDataStore {
+    //MARK: - Enums
+    enum NewsInteractorConstants {
+        static let defaultUrl = URL(string: "https://news.myseldon.com/ru/")!
+    }
+    
     // MARK: - Variables
     private let presenter: NewsPresentationLogic
     private let worker: NewsWorker
@@ -84,7 +89,8 @@ final class NewsInteractor: NewsBusinessLogic, NewsDataStore {
                 let articleData = FetchedArticleData(
                     title: item.title ?? "Ошибка заголовка",
                     announce: item.announce ?? "Ошибка описания",
-                    image: image ?? UIImage()
+                    image: image ?? UIImage(),
+                    articleUrl: item.articleUrl ?? NewsInteractorConstants.defaultUrl
                 )
                 fetchedArticles.append(articleData)
                 group.leave()
@@ -95,5 +101,9 @@ final class NewsInteractor: NewsBusinessLogic, NewsDataStore {
         group.notify(queue: .main) {
             completion(fetchedArticles)
         }
+    }
+    
+    func routeTo(_ request: NewsModel.Navigation.Request) {
+        presenter.routeTo(request.destination)
     }
 }
