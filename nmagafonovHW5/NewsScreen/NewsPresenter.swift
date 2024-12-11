@@ -14,9 +14,19 @@ final class NewsPresenter: NewsPresentationLogic {
         view?.displayStart()
     }
     
-    func presentOther(_ request: NewsModel.Other.Response) {
-        view?.displayOther()
+    func presentFreshNews(_ request: NewsModel.FreshNews.Response) {
+    
+        view?.displayFreshNews(NewsModel.FreshNews.ViewModel(articles: request.articles))
     }
+    
+    func presentMoreNews(_ request: NewsModel.MoreNews.Response) {
+        
+    }
+    
+    func presentError(_ request: String) {
+        print(request)
+    }
+    
     
     func routeTo() {
         view?.navigationController?.pushViewController(UIViewController(), animated: true)

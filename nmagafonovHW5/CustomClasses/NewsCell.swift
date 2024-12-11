@@ -11,7 +11,7 @@ final class NewsCell: UITableViewCell {
     // MARK: - Enums
     enum NewsCellConstants {
         // Wrap settings.
-        static let wrapBackgroundColor: UIColor = .systemBlue
+        static let wrapBackgroundColor: UIColor = .clear
         static let wrapLayerCornerRadius: CGFloat = 10
         static let wrapOffsetV: CGFloat = 5
         static let wrapOffsetH: CGFloat = 10
@@ -19,14 +19,20 @@ final class NewsCell: UITableViewCell {
         // ArcticleImage settings.
         
         // ArcticleTitle settings.
-        static let articleTitleFontSize: CGFloat = 20
+        static let articleTitleFontSize: CGFloat = 16
         static let articleTitleLeading: CGFloat = 5
         static let articleTitleBottom: CGFloat = 5
+        static let acrticleTitleTrailing: CGFloat = 5
+        static let articleTitleNumberOfLines: Int = 0
+        static let arcitleTitleTextColor: UIColor = UIColor(hex: "#65c666") ?? .white
         
         // ArcticleAnnounce settings.
-        static let articleAnnounceFontSize: CGFloat = 16
+        static let articleAnnounceFontSize: CGFloat = 14
         static let articleAnnounceLeading: CGFloat = 5
         static let articleAnnounceBottom: CGFloat = 5
+        static let articleAnnounceTrailing: CGFloat = 5
+        static let articleAnnounceNumberOfLines: Int = 0
+        static let arcitleAnnounceTextColor: UIColor = .white
     }
     
     // MARK: - Variables
@@ -50,9 +56,10 @@ final class NewsCell: UITableViewCell {
     }
     
     // MARK: - Public Methods
-    func configure(_ titleText: String, _ announceText: String) {
+    func configure(_ titleText: String, _ announceText: String, _ image: UIImage) {
         articleAnnounce.text = announceText
         articleTitle.text = titleText
+        articleImg.image = image
     }
     
     // MARK: - Private Methods
@@ -65,16 +72,21 @@ final class NewsCell: UITableViewCell {
         
         wrap.backgroundColor = NewsCellConstants.wrapBackgroundColor
         wrap.layer.cornerRadius = NewsCellConstants.wrapLayerCornerRadius
+        wrap.layer.masksToBounds = true
+        
         wrap.pinVertical(to: self, NewsCellConstants.wrapOffsetV)
         wrap.pinHorizontal(to: self, NewsCellConstants.wrapOffsetH)
         
-//        configureArticleImg(wrap)
+        configureArticleImg(wrap)
         configureArticleAnnounce(wrap)
         configureArticleTitle(wrap)
     }
     
     private func configureArticleImg(_ wrap: UIView) {
         wrap.addSubview(articleImg)
+        
+        articleImg.contentMode = .scaleAspectFill
+        articleImg.clipsToBounds = true
         
         articleImg.pinTop(to: wrap)
         articleImg.pinLeft(to: wrap)
@@ -85,22 +97,28 @@ final class NewsCell: UITableViewCell {
     private func configureArticleAnnounce(_ wrap: UIView) {
         wrap.addSubview(articleAnnounce)
         
-        articleAnnounce.font = .systemFont(ofSize: NewsCellConstants.articleAnnounceFontSize, weight: .regular)
-        articleAnnounce.textColor = .white
+        articleAnnounce.font = .systemFont(ofSize: NewsCellConstants.articleAnnounceFontSize, weight: .medium)
+        articleAnnounce.textColor = NewsCellConstants.arcitleAnnounceTextColor
+        articleAnnounce.numberOfLines = NewsCellConstants.articleAnnounceNumberOfLines
+        articleAnnounce.textAlignment = .justified
         
         // Set constraints to position the announce.
         articleAnnounce.pinLeft(to: wrap, NewsCellConstants.articleAnnounceLeading)
         articleAnnounce.pinBottom(to: wrap, NewsCellConstants.articleAnnounceBottom)
+        articleAnnounce.pinRight(to: wrap, NewsCellConstants.articleAnnounceTrailing)
     }
     
     private func configureArticleTitle(_ wrap: UIView) {
         wrap.addSubview(articleTitle)
         
         articleTitle.font = .systemFont(ofSize: NewsCellConstants.articleTitleFontSize, weight: .bold)
-        articleTitle.textColor = .white
+        articleTitle.textColor = NewsCellConstants.arcitleTitleTextColor
+        articleTitle.numberOfLines = NewsCellConstants.articleTitleNumberOfLines
+        articleTitle.textAlignment = .justified
         
         // Set constraints to position the announce.
         articleTitle.pinLeft(to: wrap, NewsCellConstants.articleTitleLeading)
         articleTitle.pinBottom(to: articleAnnounce.topAnchor, NewsCellConstants.articleTitleBottom)
+        articleTitle.pinRight(to: wrap, NewsCellConstants.acrticleTitleTrailing)
     }
 }

@@ -13,13 +13,15 @@ protocol NewsBusinessLogic {
 protocol NewsDataStore {
     var news: [ArticleModel] { get set }
     
-    func loadFreshNews(_request: NewsModel.Start.Request)
-    func loadMoreNews(_request: NewsModel.Other.Request)
+    func loadFreshNews(_ request: NewsModel.FreshNews.Request)
+    func loadMoreNews(_ request: NewsModel.MoreNews.Request)
 }
 
 protocol NewsPresentationLogic {
     func presentStart(_ response: NewsModel.Start.Response)
-    func presentOther(_ response: NewsModel.Other.Response)
+    func presentFreshNews(_ response: NewsModel.FreshNews.Response)
+    func presentMoreNews(_ response: NewsModel.MoreNews.Response)
+    func presentError(_ response: String)
     
     func routeTo()
 }

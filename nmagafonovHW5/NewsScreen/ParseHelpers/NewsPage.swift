@@ -5,7 +5,7 @@
 //  Created by Никита Агафонов on 11.12.2024.
 //
 
-struct NewPage: Decodable {
+struct NewsPage: Decodable {
     var news: [ArticleModel]?
     var requestId: String?
     

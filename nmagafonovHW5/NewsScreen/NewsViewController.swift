@@ -10,22 +10,26 @@ import UIKit
 final class NewsViewController: UIViewController {
     // MARK: - Enums
     enum NewsConstants {
+        // View settings.
+        static let viewBackgroundColor: UIColor = UIColor(hex: "#282828") ?? .clear
+        
         // NewsTableView settings.
         static let newsTableViewTop: CGFloat = 10
         static let newsTableViewBottom: CGFloat = 10
         static let newsTableViewLeading: CGFloat = 10
         static let newsTableViewTrailing: CGFloat = 10
-        static let newsTableRowsHeight: CGFloat = 100
+        static let newsTableRowsHeight: CGFloat = 350
     }
     
     // MARK: - Variables
-    private let interactor: NewsBusinessLogic
+    private var interactor: (NewsBusinessLogic & NewsDataStore)?
+    private var news: [FetchedArticleData] = []
     
     // UI components.
     private let newsTableView: UITableView = UITableView(frame: .zero)
     
     // MARK: - Lifecycle
-    init(interactor: NewsBusinessLogic) {
+    init(interactor: (NewsBusinessLogic & NewsDataStore)) {
         self.interactor = interactor
         super.init(nibName: nil, bundle: nil)
     }
@@ -39,6 +43,7 @@ final class NewsViewController: UIViewController {
         super.viewDidLoad()
         
         configureUI()
+        interactor?.loadFreshNews(NewsModel.FreshNews.Request())
     }
     
     // MARK: - Public Methods
@@ -46,9 +51,18 @@ final class NewsViewController: UIViewController {
     
     func displayOther() {}
     
+    func displayFreshNews(_ viewModel: NewsModel.FreshNews.ViewModel) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.news = viewModel.articles
+            self.newsTableView.reloadData()
+        }
+    }
+    
     // MARK: - Private Methods
     private func configureUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = NewsConstants.viewBackgroundColor
         
         configureNewsTableView()
     }
@@ -56,7 +70,7 @@ final class NewsViewController: UIViewController {
     private func configureNewsTableView() {
         view.addSubview(newsTableView)
         
-        newsTableView.backgroundColor = .systemGray
+        newsTableView.backgroundColor = .clear
         
         // Set the data source and delegate for the tableView view.
         newsTableView.dataSource = self
@@ -89,7 +103,7 @@ final class NewsViewController: UIViewController {
 // MARK: - UITableViewDataSource
 extension NewsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10;
+        return news.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -98,10 +112,10 @@ extension NewsViewController: UITableViewDataSource {
             for: indexPath
         ) as! NewsCell
         
-        let title = "Title \(indexPath.row)"
-        let announce = "Announce \(indexPath.row)"
-        
-        cell.configure(title, announce)
+        let idx = indexPath.row
+        if (news.indices.contains(idx)) {
+            cell.configure(news[idx].title, news[idx].announce, news[idx].image)
+        }
                 
         return cell
     }
@@ -113,7 +127,7 @@ extension NewsViewController : UITableViewDelegate {
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath
     ) {
-        print("Selected \(indexPath)")
+        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
