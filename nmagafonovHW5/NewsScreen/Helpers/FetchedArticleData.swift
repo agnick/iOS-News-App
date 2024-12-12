@@ -10,6 +10,7 @@ import UIKit
 struct FetchedArticleData {
     let title: String
     let announce: String
-    let image: UIImage
+    var image: UIImage?
+    let imageUrl: URL?
     let articleUrl: URL
 }

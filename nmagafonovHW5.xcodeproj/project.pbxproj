@@ -6,12 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		26FB76A02D0B397500D31C60 /* vk-ios-sdk in Frameworks */ = {isa = PBXBuildFile; productRef = 26FB769F2D0B397500D31C60 /* vk-ios-sdk */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		26D1B94B2D09F55200275435 /* nmagafonovHW5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nmagafonovHW5.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		26D1B95D2D09F55300275435 /* Exceptions for "nmagafonovHW5" folder in "nmagafonovHW5" target */ = {
+		26FB769D2D0B38C500D31C60 /* Exceptions for "nmagafonovHW5" folder in "nmagafonovHW5" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -21,10 +25,10 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		26D1B94D2D09F55200275435 /* nmagafonovHW5 */ = {
+		26FB76882D0B38C500D31C60 /* nmagafonovHW5 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				26D1B95D2D09F55300275435 /* Exceptions for "nmagafonovHW5" folder in "nmagafonovHW5" target */,
+				26FB769D2D0B38C500D31C60 /* Exceptions for "nmagafonovHW5" folder in "nmagafonovHW5" target */,
 			);
 			path = nmagafonovHW5;
 			sourceTree = "<group>";
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26FB76A02D0B397500D31C60 /* vk-ios-sdk in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -45,7 +50,7 @@
 		26D1B9422D09F55200275435 = {
 			isa = PBXGroup;
 			children = (
-				26D1B94D2D09F55200275435 /* nmagafonovHW5 */,
+				26FB76882D0B38C500D31C60 /* nmagafonovHW5 */,
 				26D1B94C2D09F55200275435 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -74,10 +79,11 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				26D1B94D2D09F55200275435 /* nmagafonovHW5 */,
+				26FB76882D0B38C500D31C60 /* nmagafonovHW5 */,
 			);
 			name = nmagafonovHW5;
 			packageProductDependencies = (
+				26FB769F2D0B397500D31C60 /* vk-ios-sdk */,
 			);
 			productName = nmagafonovHW5;
 			productReference = 26D1B94B2D09F55200275435 /* nmagafonovHW5.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = 26D1B9422D09F55200275435;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				26FB769E2D0B397500D31C60 /* XCRemoteSwiftPackageReference "vk-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 26D1B94C2D09F55200275435 /* Products */;
 			projectDirPath = "";
@@ -333,6 +342,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		26FB769E2D0B397500D31C60 /* XCRemoteSwiftPackageReference "vk-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/qe0/vk-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		26FB769F2D0B397500D31C60 /* vk-ios-sdk */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26FB769E2D0B397500D31C60 /* XCRemoteSwiftPackageReference "vk-ios-sdk" */;
+			productName = "vk-ios-sdk";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 26D1B9432D09F55200275435 /* Project object */;
 }

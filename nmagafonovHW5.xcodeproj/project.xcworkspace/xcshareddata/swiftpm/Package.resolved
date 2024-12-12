@@ -1,0 +1,15 @@
+{
+  "originHash" : "f6746e081dfeef29cba21a2f9f64d4f843ae29bd32447f656551335ec16552fc",
+  "pins" : [
+    {
+      "identity" : "vk-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/qe0/vk-ios-sdk.git",
+      "state" : {
+        "revision" : "d58c64b962e880a8ba003550a01a36fd60c255db",
+        "version" : "4.2.0"
+      }
+    }
+  ],
+  "version" : 3
+}

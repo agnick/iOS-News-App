@@ -8,22 +8,6 @@
 import UIKit
 
 enum NewsModel {
-    enum Start {
-        struct Request {}
-        
-        struct Response {}
-        
-        struct ViewModel {}
-    }
-    
-    enum Other {
-        struct Request {}
-        
-        struct Response {}
-        
-        struct ViewModel {}
-    }
-    
     enum FreshNews {
         struct Request {}
         
@@ -39,9 +23,26 @@ enum NewsModel {
     enum MoreNews {
         struct Request {}
         
-        struct Response {}
+        struct Response {
+            let articles: [FetchedArticleData]
+        }
         
-        struct ViewModel {}
+        struct ViewModel {
+            let articles: [FetchedArticleData]
+        }
+    }
+    
+    enum Share {
+        struct Request {
+            let article: FetchedArticleData?
+        }
+        
+        struct Response {
+            let activityItems: [Any]
+        }
+        
+        struct ViewModel {
+        }
     }
     
     enum Navigation {

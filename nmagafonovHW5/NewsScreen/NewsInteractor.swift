@@ -10,28 +10,37 @@ import UIKit
 final class NewsInteractor: NewsBusinessLogic, NewsDataStore {
     //MARK: - Enums
     enum NewsInteractorConstants {
-        static let defaultUrl = URL(string: "https://news.myseldon.com/ru/")!
+        static let defaultUrl: URL = URL(
+            string: "https://news.myseldon.com/ru/"
+        )!
+        static let parseErrorText: String = "Failed to load news."
+        static let articleTextError: String = "Load error."
+        static let rubricId: Int = 4
+        static let maxPagesToLoad: Int = 20
     }
     
     // MARK: - Variables
     private let presenter: NewsPresentationLogic
     private let worker: NewsWorker
     
-    var news: [ArticleModel] = [] {
+    private var currentPageIndex: Int = 1
+    private var isLoadingMoreNews: Bool = false
+    
+    var news: [FetchedArticleData] = [] {
         didSet {
-            DispatchQueue.global().async { [weak self] in
+            DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                self.getDataFromNews(self.news) {
-                    fetchedArticles in self.presenter
-                        .presentFreshNews(
-                            NewsModel.FreshNews
-                                .Response(articles: fetchedArticles)
-                        )
+                if oldValue.isEmpty && !news.isEmpty {
+                    self.presenter.presentFreshNews(NewsModel.FreshNews.Response(articles: news))
+                } else if !oldValue.isEmpty && news.count > oldValue.count {
+                    let newArticles = Array(news[oldValue.count..<news.count])
+                    self.presenter.presentMoreNews(NewsModel.MoreNews.Response(articles: newArticles))
                 }
             }
         }
     }
+    
     
     // MARK: - Lifecycle
     init (presenter: NewsPresentationLogic, worker: NewsWorker) {
@@ -39,68 +48,93 @@ final class NewsInteractor: NewsBusinessLogic, NewsDataStore {
         self.worker = worker
     }
     
-    // MARK: - Start load
-    func loadStart(_ request: NewsModel.Start.Request) {
-        presenter.presentStart(NewsModel.Start.Response())
-    }
-    
-    func loadOther(_ request: NewsModel.Other.Request) {
-        
-    }
-    
     // MARK: - Load news methods
     func loadFreshNews(_ request: NewsModel.FreshNews.Request) {
-        DispatchQueue.global().async { [weak self] in
-            guard let self = self else { return }
-            
-            self.worker.fetchNews{[weak self] fetchedNews in
+        currentPageIndex = 1
+        
+        worker.fetchNews(NewsInteractorConstants.rubricId, currentPageIndex) { [weak self] fetchedNews in
                 guard let self = self else { return }
+                
                 if let fetchedNews = fetchedNews {
-                    DispatchQueue.main.async {
-                        self.news = fetchedNews
+                    
+                    let newArticles = fetchedNews.map { article -> FetchedArticleData in
+                        return  FetchedArticleData(
+                            title: article.title ?? NewsInteractorConstants.articleTextError,
+                            announce: article.announce ?? NewsInteractorConstants.articleTextError,
+                            image: nil,
+                            imageUrl: article.img?.url,
+                            articleUrl: article.articleUrl ?? NewsInteractorConstants.defaultUrl
+                        )
                     }
+                    
+                    self.news = newArticles
                 } else {
-                    DispatchQueue.main.async {
-                        self.presenter
-                            .presentError("Не удалось загрузить новости.")
-                    }
+                    self.presenter.presentError(NewsInteractorConstants.parseErrorText)
                 }
-            }
         }
     }
     
     func loadMoreNews(_ request: NewsModel.MoreNews.Request) {
+        guard !isLoadingMoreNews, currentPageIndex < NewsInteractorConstants.maxPagesToLoad else {
+            return
+        }
         
+        isLoadingMoreNews = true
+        let nextPageIndex = currentPageIndex + 1
+        
+        worker.fetchNews(NewsInteractorConstants.rubricId, currentPageIndex) { [weak self] fetchedNews in
+                guard let self = self else { return }
+                
+                if let fetchedNews = fetchedNews {
+                    self.currentPageIndex = nextPageIndex
+                    
+                    let newArticles = fetchedNews.map { article -> FetchedArticleData in
+                        return  FetchedArticleData(
+                            title: article.title ?? NewsInteractorConstants.articleTextError,
+                            announce: article.announce ?? NewsInteractorConstants.articleTextError,
+                            image: nil,
+                            imageUrl: article.img?.url,
+                            articleUrl: article.articleUrl ?? NewsInteractorConstants.defaultUrl
+                        )
+                    }
+                    
+                    self.news += newArticles
+                } else {
+                    self.presenter.presentError(NewsInteractorConstants.parseErrorText)
+                }
+                
+                self.isLoadingMoreNews = false
+        }
     }
     
-    // MARK: - Private methods
-    private func getDataFromNews(
-        _ news: [ArticleModel],
-        completion: @escaping ([FetchedArticleData]) -> Void
-    ) {
-        var fetchedArticles: [FetchedArticleData] = []
-        let group = DispatchGroup()
+    func loadImage(for index: Int, completion: @escaping (UIImage?) -> Void) {
+        guard index < news.count, let imageURL = news[index].imageUrl else {
+            completion(nil)
+            return
+        }
         
-        for item in news {
-            group.enter()
-            
-            worker.loadImage(from: item.img?.url) {
-                image in
-                let articleData = FetchedArticleData(
-                    title: item.title ?? "Ошибка заголовка",
-                    announce: item.announce ?? "Ошибка описания",
-                    image: image ?? UIImage(),
-                    articleUrl: item.articleUrl ?? NewsInteractorConstants.defaultUrl
-                )
-                fetchedArticles.append(articleData)
-                group.leave()
+        worker.loadImage(from: imageURL) { [weak self] image in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                
+                if let image = image {
+                    self.news[index].image = image
+                }
+               
+                completion(image)
             }
-            
+        }
+    }
+    
+    func shareArticle(_ request: NewsModel.Share.Request) {
+        guard let article = request.article else {
+            presenter.presentError("Artcile to share not found")
+            return
         }
         
-        group.notify(queue: .main) {
-            completion(fetchedArticles)
-        }
+        let activityItems = [article.title, article.articleUrl as Any]
+        
+        presenter.presentShare(NewsModel.Share.Response(activityItems: activityItems))
     }
     
     func routeTo(_ request: NewsModel.Navigation.Request) {

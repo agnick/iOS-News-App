@@ -22,7 +22,7 @@ final class NewsCell: UITableViewCell {
         static let articleTitleFontSize: CGFloat = 16
         static let articleTitleLeading: CGFloat = 5
         static let articleTitleBottom: CGFloat = 5
-        static let acrticleTitleTrailing: CGFloat = 5
+        static let acrticleTitleTrailing: CGFloat = 50
         static let articleTitleNumberOfLines: Int = 0
         static let arcitleTitleTextColor: UIColor = UIColor(hex: "#65c666") ?? .white
         
@@ -56,15 +56,22 @@ final class NewsCell: UITableViewCell {
     }
     
     // MARK: - Public Methods
-    func configure(_ titleText: String, _ announceText: String, _ image: UIImage) {
-        articleAnnounce.text = announceText
-        articleTitle.text = titleText
-        articleImg.image = image
+    func configure(_ article: FetchedArticleData, at indexPath: IndexPath, loadImage: @escaping (Int, @escaping (UIImage?) -> Void) -> Void) {
+        articleAnnounce.text = article.title
+        articleTitle.text = article.announce
+        articleImg.image = nil
+        
+        loadImage(indexPath.row) { [weak self] image in
+            DispatchQueue.main.async {
+                self?.articleImg.image = image
+            }
+        }
     }
     
     // MARK: - Private Methods
     private func configureUI() {
         selectionStyle = .none
+        contentView.backgroundColor = .clear
         backgroundColor = .clear
         
         let wrap: UIView = UIView()

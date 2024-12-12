@@ -12,8 +12,8 @@ final class NewsWorker {
     private let decoder: JSONDecoder = JSONDecoder()
     
     // MARK: - Fetch news
-    func fetchNews(completion: @escaping ([ArticleModel]?) -> Void) {
-        guard let url = getURL(4, 1) else { return }
+    func fetchNews(_ rubricId: Int, _ pageIndex: Int, completion: @escaping ([ArticleModel]?) -> Void) {
+        guard let url = getURL(rubricId, pageIndex) else { return }
         
         URLSession.shared
             .dataTask(with: url) {
@@ -43,7 +43,7 @@ final class NewsWorker {
             return
         }
         
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             guard let data = try? Data(contentsOf: url), let image = UIImage(data: data) else {
                 DispatchQueue.main.async {
                     completion(nil)

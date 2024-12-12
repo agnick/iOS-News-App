@@ -11,7 +11,9 @@ final class NewsViewController: UIViewController {
     // MARK: - Enums
     enum NewsConstants {
         // View settings.
-        static let viewBackgroundColor: UIColor = UIColor(hex: "#282828") ?? .clear
+        static let viewBackgroundColor: UIColor = UIColor(
+            hex: "#282828"
+        ) ?? .clear
         
         // NewsTableView settings.
         static let newsTableViewTop: CGFloat = 10
@@ -19,14 +21,15 @@ final class NewsViewController: UIViewController {
         static let newsTableViewLeading: CGFloat = 10
         static let newsTableViewTrailing: CGFloat = 10
         static let newsTableRowsHeight: CGFloat = 350
+        static let newsTableScrollDist: CGFloat = 200
     }
     
     // MARK: - Variables
-    private var interactor: (NewsBusinessLogic & NewsDataStore)?
-    private var news: [FetchedArticleData] = []
+    var interactor: (NewsBusinessLogic & NewsDataStore)?
     
     // UI components.
-    private let newsTableView: UITableView = UITableView(frame: .zero)
+    let newsTableView: UITableView = UITableView(frame: .zero)
+    let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView(style: .large)
     
     // MARK: - Lifecycle
     init(interactor: (NewsBusinessLogic & NewsDataStore)) {
@@ -43,28 +46,16 @@ final class NewsViewController: UIViewController {
         super.viewDidLoad()
         
         configureUI()
+        activityIndicator.startAnimating()
         interactor?.loadFreshNews(NewsModel.FreshNews.Request())
     }
-    
-    // MARK: - Public Methods
-    func displayStart() {}
-    
-    func displayOther() {}
-    
-    func displayFreshNews(_ viewModel: NewsModel.FreshNews.ViewModel) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.news = viewModel.articles
-            self.newsTableView.reloadData()
-        }
-    }
-    
+        
     // MARK: - Private Methods
     private func configureUI() {
         view.backgroundColor = NewsConstants.viewBackgroundColor
         
         configureNewsTableView()
+        configureActivityIndicator()
     }
     
     private func configureNewsTableView() {
@@ -97,13 +88,22 @@ final class NewsViewController: UIViewController {
         newsTableView.pinLeft(to: view, NewsConstants.newsTableViewLeading)
         newsTableView.pinRight(to: view, NewsConstants.newsTableViewTrailing)
     }
+    
+    private func configureActivityIndicator() {
+        view.addSubview(activityIndicator)
+        
+        activityIndicator.color = .white
+        activityIndicator.hidesWhenStopped = true
+        
+        activityIndicator.pinCenter(to: view)
+    }
         
 }
 
 // MARK: - UITableViewDataSource
 extension NewsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return news.count
+        return interactor?.news.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -112,11 +112,12 @@ extension NewsViewController: UITableViewDataSource {
             for: indexPath
         ) as! NewsCell
         
-        let idx = indexPath.row
-        if (news.indices.contains(idx)) {
-            cell.configure(news[idx].title, news[idx].announce, news[idx].image)
+        if let article = interactor?.news[indexPath.row] {
+            cell.configure(article, at: indexPath) { [weak self] row, completion in
+                self?.interactor?.loadImage(for: row, completion: completion)
+            }
         }
-                
+        
         return cell
     }
 }
@@ -127,13 +128,47 @@ extension NewsViewController : UITableViewDelegate {
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath
     ) {
-        let url = news[indexPath.row].articleUrl
+        let url = (interactor?.news[indexPath.row].articleUrl)!
         let destination = WebViewController(url)
         
-        interactor?.routeTo(NewsModel.Navigation.Request(destination: destination))
+        interactor?
+            .routeTo(NewsModel.Navigation.Request(destination: destination))
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return NewsConstants.newsTableRowsHeight
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let shareAction = UIContextualAction(style: .normal, title: "Share") {
+            [weak self] _,
+            _,
+            completion in
+            guard let self = self, let article = self.interactor?.news[indexPath.row] else {
+                completion(false)
+                return
+            }
+            
+            self.interactor?.shareArticle(NewsModel.Share.Request(article: article))
+            completion(true)
+        }
+        
+        shareAction.backgroundColor = .systemBlue
+        
+        return UISwipeActionsConfiguration(actions: [shareAction])
+    }
+}
+
+// MARK: - UIScrollViewDelegate
+extension NewsViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.size.height
+        
+        
+        if offsetY > contentHeight - height - NewsConstants.newsTableScrollDist {
+            interactor?.loadMoreNews(NewsModel.MoreNews.Request())
+        }
     }
 }

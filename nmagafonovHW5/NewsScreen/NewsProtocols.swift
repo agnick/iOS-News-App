@@ -8,24 +8,24 @@
 import UIKit
 
 protocol NewsBusinessLogic {
-    func loadStart(_ request: NewsModel.Start.Request)
-    func loadOther(_ request: NewsModel.Other.Request)
-    
+    func loadFreshNews(_ request: NewsModel.FreshNews.Request)
+    func loadMoreNews(_ request: NewsModel.MoreNews.Request)
+    func shareArticle(_ request: NewsModel.Share.Request)
     func routeTo(_ request: NewsModel.Navigation.Request)
+    
+    func loadImage(for index: Int, completion: @escaping (UIImage?) -> Void)
+    
 }
 
 protocol NewsDataStore {
-    var news: [ArticleModel] { get set }
-    
-    func loadFreshNews(_ request: NewsModel.FreshNews.Request)
-    func loadMoreNews(_ request: NewsModel.MoreNews.Request)
+    var news: [FetchedArticleData] { get set }
 }
 
 protocol NewsPresentationLogic {
-    func presentStart(_ response: NewsModel.Start.Response)
     func presentFreshNews(_ response: NewsModel.FreshNews.Response)
     func presentMoreNews(_ response: NewsModel.MoreNews.Response)
     func presentError(_ response: String)
+    func presentShare(_ response: NewsModel.Share.Response)
     
     func routeTo(_ viewController: UIViewController)
 }
