@@ -39,7 +39,7 @@ final class NewsCell: UITableViewCell {
     static let reuseId: String = "NewsCell"
     
     // UI Components.
-    private let articleImg: UIImageView = UIImageView()
+    private let articleImg: CustomImageView = CustomImageView()
     private let articleTitle: UILabel = UILabel()
     private let articleAnnounce: UILabel = UILabel()
     
@@ -56,15 +56,17 @@ final class NewsCell: UITableViewCell {
     }
     
     // MARK: - Public Methods
-    func configure(_ article: FetchedArticleData, at indexPath: IndexPath, loadImage: @escaping (Int, @escaping (UIImage?) -> Void) -> Void) {
+    func configure(_ article: FetchedArticleData, _ interactor: (NewsBusinessLogic & NewsDataStore)) {
+        // Update the cell title and announce.
         articleAnnounce.text = article.title
         articleTitle.text = article.announce
-        articleImg.image = nil
         
-        loadImage(indexPath.row) { [weak self] image in
-            DispatchQueue.main.async {
-                self?.articleImg.image = image
-            }
+        // Checking that the url is not nil.
+        if let imageUrl = article.imageUrl {
+            // Call the setImage method on image, pass there a link and an interactor for the download request.
+            articleImg.setImage(from: imageUrl, interactor: interactor)
+        } else {
+            articleImg.image = nil
         }
     }
     
@@ -77,13 +79,16 @@ final class NewsCell: UITableViewCell {
         let wrap: UIView = UIView()
         addSubview(wrap)
         
+        // Wrap settings.
         wrap.backgroundColor = NewsCellConstants.wrapBackgroundColor
         wrap.layer.cornerRadius = NewsCellConstants.wrapLayerCornerRadius
         wrap.layer.masksToBounds = true
         
+        // Wrap constraints.
         wrap.pinVertical(to: self, NewsCellConstants.wrapOffsetV)
         wrap.pinHorizontal(to: self, NewsCellConstants.wrapOffsetH)
         
+        // Configure other UI components.
         configureArticleImg(wrap)
         configureArticleAnnounce(wrap)
         configureArticleTitle(wrap)
@@ -92,9 +97,11 @@ final class NewsCell: UITableViewCell {
     private func configureArticleImg(_ wrap: UIView) {
         wrap.addSubview(articleImg)
         
+        // Image settings.
         articleImg.contentMode = .scaleAspectFill
         articleImg.clipsToBounds = true
         
+        // Image constraints.
         articleImg.pinTop(to: wrap)
         articleImg.pinLeft(to: wrap)
         articleImg.pinRight(to: wrap)
@@ -104,12 +111,13 @@ final class NewsCell: UITableViewCell {
     private func configureArticleAnnounce(_ wrap: UIView) {
         wrap.addSubview(articleAnnounce)
         
+        // Announce settings.
         articleAnnounce.font = .systemFont(ofSize: NewsCellConstants.articleAnnounceFontSize, weight: .medium)
         articleAnnounce.textColor = NewsCellConstants.arcitleAnnounceTextColor
         articleAnnounce.numberOfLines = NewsCellConstants.articleAnnounceNumberOfLines
         articleAnnounce.textAlignment = .justified
         
-        // Set constraints to position the announce.
+        // Announce constraints.
         articleAnnounce.pinLeft(to: wrap, NewsCellConstants.articleAnnounceLeading)
         articleAnnounce.pinBottom(to: wrap, NewsCellConstants.articleAnnounceBottom)
         articleAnnounce.pinRight(to: wrap, NewsCellConstants.articleAnnounceTrailing)
@@ -118,12 +126,13 @@ final class NewsCell: UITableViewCell {
     private func configureArticleTitle(_ wrap: UIView) {
         wrap.addSubview(articleTitle)
         
+        // Title settings.
         articleTitle.font = .systemFont(ofSize: NewsCellConstants.articleTitleFontSize, weight: .bold)
         articleTitle.textColor = NewsCellConstants.arcitleTitleTextColor
         articleTitle.numberOfLines = NewsCellConstants.articleTitleNumberOfLines
         articleTitle.textAlignment = .justified
         
-        // Set constraints to position the announce.
+        // Title constraints.
         articleTitle.pinLeft(to: wrap, NewsCellConstants.articleTitleLeading)
         articleTitle.pinBottom(to: articleAnnounce.topAnchor, NewsCellConstants.articleTitleBottom)
         articleTitle.pinRight(to: wrap, NewsCellConstants.acrticleTitleTrailing)

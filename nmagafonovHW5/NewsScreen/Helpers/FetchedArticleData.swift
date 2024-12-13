@@ -7,6 +7,7 @@
 
 import UIKit
 
+// Data struct needed to be transferred to the UI.
 struct FetchedArticleData {
     let title: String
     let announce: String

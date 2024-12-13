@@ -8,6 +8,7 @@
 import UIKit
 
 enum NewsModel {
+    // MARK: - FreshNews model
     enum FreshNews {
         struct Request {}
         
@@ -20,6 +21,7 @@ enum NewsModel {
         }
     }
     
+    // MARK: - MoreNews model
     enum MoreNews {
         struct Request {}
         
@@ -32,6 +34,7 @@ enum NewsModel {
         }
     }
     
+    // MARK: - Share model
     enum Share {
         struct Request {
             let article: FetchedArticleData?
@@ -45,9 +48,16 @@ enum NewsModel {
         }
     }
     
+    // MARK: - Navigation model
     enum Navigation {
         struct Request {
             let destination: UIViewController
+        }
+        
+        struct Response {
+        }
+        
+        struct ViewModel {
         }
     }
 }
